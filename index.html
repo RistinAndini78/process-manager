@@ -1,1160 +1,1029 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id" class="scroll-smooth">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Manajemen Proses dan Status Transisi - Sistem Operasi</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="style.css">
-    <!-- <style>
-
-        /* Animations */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes bounce {
-            0%, 100% {
-                transform: translateY(-25%);
-                animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
-            }
-            50% {
-                transform: translateY(0);
-                animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
-            }
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.5;
-            }
-        }
-
-        .animate-bounce {
-            animation: bounce 1s infinite;
-        }
-
-        .animate-pulse {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-
-        .animate-fadeIn {
-            animation: fadeIn 0.6s ease-out;
-        }
-
-        /* Toast notification */
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #10b981;
-            color: white;
-            padding: 16px 24px;
-            border-radius: 8px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            transform: translateX(400px);
-            transition: transform 0.3s ease-in-out;
-            z-index: 1000;
-        }
-
-        .toast.show {
-            transform: translateX(0);
-        }
-
-        .toast.error {
-            background: #ef4444;
-        }
-    </style> -->
-</head>
-<body class="bg-slate-950 text-white">
-
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="bg-slate-950 text-white">
     <!-- Navbar -->
-    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex-shrink-0">
-                    <a href="#hero" class="text-xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent hover:from-emerald-300 hover:to-teal-300 transition-all duration-300">
-                        OS Process Manager
-                    </a>
-                </div>
+    <nav
+      id="navbar"
+      class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <div class="flex-shrink-0">
+            <a
+              href="#hero"
+              class="text-xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent hover:from-emerald-300 hover:to-teal-300 transition-all duration-300"
+            >
+              OS Process Manager
+            </a>
+          </div>
 
-                <!-- Desktop Navigation -->
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-4">
-                        <a href="#hero" class="nav-link text-slate-300 hover:text-emerald-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300">Home</a>
-                        <a href="#about" class="nav-link text-slate-300 hover:text-emerald-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300">About</a>
-                        <a href="#materi" class="nav-link text-slate-300 hover:text-emerald-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300">Materi</a>
-                        <a href="#simulasi" class="nav-link text-slate-300 hover:text-emerald-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300">Simulasi</a>
-                    </div>
-                </div>
-
-                <!-- Mobile menu button -->
-                <div class="md:hidden">
-                    <button id="mobile-menu-btn" class="text-slate-300 hover:text-emerald-400 transition-colors duration-300">
-                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                        </svg>
-                    </button>
-                </div>
+          <!-- Desktop Navigation -->
+          <div class="hidden md:block">
+            <div class="ml-10 flex items-baseline space-x-4">
+              <a
+                href="#hero"
+                class="nav-link text-slate-300 hover:text-emerald-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300"
+                >Home</a
+              >
+              <a
+                href="#about"
+                class="nav-link text-slate-300 hover:text-emerald-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300"
+                >About</a
+              >
+              <a
+                href="#materi"
+                class="nav-link text-slate-300 hover:text-emerald-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300"
+                >Materi</a
+              >
+              <a
+                href="#simulasi"
+                class="nav-link text-slate-300 hover:text-emerald-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-300"
+                >Simulasi</a
+              >
             </div>
-        </div>
+          </div>
 
-        <!-- Mobile Navigation -->
-        <div id="mobile-menu" class="md:hidden hidden bg-slate-900/98 backdrop-blur-md">
-            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <a href="#hero" class="mobile-nav-link text-slate-300 hover:text-emerald-400 block px-3 py-2 rounded-md text-base font-medium">Home</a>
-                <a href="#about" class="mobile-nav-link text-slate-300 hover:text-emerald-400 block px-3 py-2 rounded-md text-base font-medium">About</a>
-                <a href="#materi" class="mobile-nav-link text-slate-300 hover:text-emerald-400 block px-3 py-2 rounded-md text-base font-medium">Materi</a>
-                <a href="#simulasi" class="mobile-nav-link text-slate-300 hover:text-emerald-400 block px-3 py-2 rounded-md text-base font-medium">Simulasi</a>
-            </div>
+          <!-- Mobile menu button -->
+          <div class="md:hidden">
+            <button
+              id="mobile-menu-btn"
+              class="text-slate-300 hover:text-emerald-400 transition-colors duration-300"
+            >
+              <svg
+                class="h-6 w-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
+      </div>
+
+      <!-- Mobile Navigation -->
+      <div
+        id="mobile-menu"
+        class="md:hidden hidden bg-slate-900/98 backdrop-blur-md"
+      >
+        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+          <a
+            href="#hero"
+            class="mobile-nav-link text-slate-300 hover:text-emerald-400 block px-3 py-2 rounded-md text-base font-medium"
+            >Home</a
+          >
+          <a
+            href="#about"
+            class="mobile-nav-link text-slate-300 hover:text-emerald-400 block px-3 py-2 rounded-md text-base font-medium"
+            >About</a
+          >
+          <a
+            href="#materi"
+            class="mobile-nav-link text-slate-300 hover:text-emerald-400 block px-3 py-2 rounded-md text-base font-medium"
+            >Materi</a
+          >
+          <a
+            href="#simulasi"
+            class="mobile-nav-link text-slate-300 hover:text-emerald-400 block px-3 py-2 rounded-md text-base font-medium"
+            >Simulasi</a
+          >
+        </div>
+      </div>
     </nav>
 
     <!-- Hero Section -->
-    <section id="hero" class="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-        <!-- Animated background elements -->
-        <div class="absolute inset-0 overflow-hidden">
-            <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl animate-pulse"></div>
-            <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
-        </div>
+    <section
+      id="hero"
+      class="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"
+    >
+      <!-- Animated background elements -->
+      <div class="absolute inset-0 overflow-hidden">
+        <div
+          class="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl animate-pulse"
+        ></div>
+        <div
+          class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl animate-pulse"
+          style="animation-delay: 1s"
+        ></div>
+      </div>
 
-        <div class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-16">
-            <!-- Icon -->
-            <div class="flex justify-center mb-8 animate-bounce">
-                <div class="p-4 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-2xl backdrop-blur-sm border border-emerald-500/30">
-                    <svg class="w-16 h-16 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>
-                    </svg>
-                </div>
-            </div>
-
-            <!-- Main heading -->
-            <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-                <span class="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
-                    Manajemen Proses
-                </span>
-                <br>
-                <span class="text-white">& Status Transisi</span>
-            </h1>
-
-            <!-- Subtitle -->
-            <p class="text-xl sm:text-2xl text-slate-300 mb-12 max-w-3xl mx-auto leading-relaxed">
-                Platform pembelajaran interaktif untuk memahami penjadwalan proses sistem operasi dan transisi status
-            </p>
-
-            <!-- CTA Button -->
-            <a href="#simulasi" class="inline-flex items-center bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-emerald-500/50 transition-all duration-300 transform hover:scale-105">
-                Mulai Simulasi
-                <svg class="ml-2 w-5 h-5 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                </svg>
-            </a>
-
-            <!-- Stats -->
-            <div class="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-8">
-                <div class="text-center">
-                    <div class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent mb-2">4</div>
-                    <div class="text-sm text-slate-400">Algoritma</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent mb-2">5</div>
-                    <div class="text-sm text-slate-400">Status Proses</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent mb-2">100%</div>
-                    <div class="text-sm text-slate-400">Interaktif</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent mb-2">Fun</div>
-                    <div class="text-sm text-slate-400">Pembelajaran</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Scroll indicator -->
-        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-            <svg class="w-8 h-8 text-slate-400 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+      <div
+        class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-16"
+      >
+        <!-- Icon -->
+        <div class="flex justify-center mb-8 animate-bounce">
+          <div
+            class="p-4 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-2xl backdrop-blur-sm border border-emerald-500/30"
+          >
+            <svg
+              class="w-16 h-16 text-emerald-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
+              />
             </svg>
+          </div>
         </div>
+
+        <!-- Main heading -->
+        <h1
+          class="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight"
+        >
+          <span
+            class="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent"
+          >
+            Manajemen Proses
+          </span>
+          <br />
+          <span class="text-white">& Status Transisi</span>
+        </h1>
+
+        <!-- Subtitle -->
+        <p
+          class="text-xl sm:text-2xl text-slate-300 mb-12 max-w-3xl mx-auto leading-relaxed"
+        >
+          Platform pembelajaran interaktif untuk memahami penjadwalan proses
+          sistem operasi dan transisi status
+        </p>
+
+        <!-- CTA Button -->
+        <a
+          href="#simulasi"
+          class="inline-flex items-center bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-emerald-500/50 transition-all duration-300 transform hover:scale-105"
+        >
+          Mulai Simulasi
+          <svg
+            class="ml-2 w-5 h-5 animate-bounce"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </a>
+
+        <!-- Stats -->
+        <div class="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-8">
+          <div class="text-center">
+            <div
+              class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent mb-2"
+            >
+              4
+            </div>
+            <div class="text-sm text-slate-400">Algoritma</div>
+          </div>
+          <div class="text-center">
+            <div
+              class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent mb-2"
+            >
+              5
+            </div>
+            <div class="text-sm text-slate-400">Status Proses</div>
+          </div>
+          <div class="text-center">
+            <div
+              class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent mb-2"
+            >
+              100%
+            </div>
+            <div class="text-sm text-slate-400">Interaktif</div>
+          </div>
+          <div class="text-center">
+            <div
+              class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent mb-2"
+            >
+              Fun
+            </div>
+            <div class="text-sm text-slate-400">Pembelajaran</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scroll indicator -->
+      <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+        <svg
+          class="w-8 h-8 text-slate-400 animate-bounce"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+      </div>
     </section>
 
     <!-- About Section -->
     <section id="about" class="py-20 bg-slate-900">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Section header -->
-            <div class="text-center mb-16">
-                <h2 class="text-4xl sm:text-5xl font-bold mb-4">
-                    <span class="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
-                        Tentang Platform Ini
-                    </span>
-                </h2>
-                <p class="text-xl text-slate-300 max-w-3xl mx-auto">
-                    Alat edukatif interaktif yang dirancang untuk membantu Anda menguasai konsep sistem operasi melalui simulasi langsung
-                </p>
-            </div>
-
-            <!-- Feature cards -->
-             <div class="max-w-6xl mx-auto">
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="bg-slate-800/50 border border-slate-700 hover:border-emerald-500/50 rounded-xl p-8 transition-all duration-300 hover:transform hover:scale-105">
-                    <div class="flex justify-center mb-6">
-                        <div class="p-4 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-xl">
-                            <svg class="w-10 h-10 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-4 text-center">Pelajari Manajemen Proses</h3>
-                    <p class="text-slate-300 text-center leading-relaxed">
-                        Pahami bagaimana sistem operasi mengelola proses dan siklus hidupnya dari pembuatan hingga terminasi.
-                    </p>
-                </div>
-
-                <div class="bg-slate-800/50 border border-slate-700 hover:border-emerald-500/50 rounded-xl p-8 transition-all duration-300 hover:transform hover:scale-105">
-                    <div class="flex justify-center mb-6">
-                        <div class="p-4 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-xl">
-                            <svg class="w-10 h-10 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-4 text-center">Praktik Algoritma Penjadwalan</h3>
-                    <p class="text-slate-300 text-center leading-relaxed">
-                        Bereksperimen dengan algoritma penjadwalan FCFS, SJF, Priority, dan Round Robin secara real-time.
-                    </p>
-                </div>
-
-                <div class="bg-slate-800/50 border border-slate-700 hover:border-emerald-500/50 rounded-xl p-8 transition-all duration-300 hover:transform hover:scale-105">
-                    <div class="flex justify-center mb-6">
-                        <div class="p-4 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-xl">
-                            <svg class="w-10 h-10 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <h3 class="text-xl font-bold text-white mb-4 text-center">Visualisasi Transisi Status</h3>
-                    <p class="text-slate-300 text-center leading-relaxed">
-                        Lihat bagaimana proses berpindah antara status New, Ready, Running, Waiting, dan Terminated langkah demi langkah.
-                    </p>
-                </div>
-            </div>
-            </div>
-
-            <!-- Additional info -->
-            <div class="mt-16 text-center">
-                <div class="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/30 rounded-2xl p-8 max-w-4xl mx-auto">
-                    <h3 class="text-2xl font-bold text-white mb-4">Apa yang Akan Anda Pelajari</h3>
-                    <p class="text-slate-300 leading-relaxed">
-                        Platform ini memberikan pemahaman komprehensif tentang manajemen proses dalam sistem operasi.
-                        Anda akan mempelajari cara kerja berbagai algoritma penjadwalan, bagaimana proses bertransisi antara berbagai status,
-                        dan mendapatkan pengalaman praktis melalui simulasi interaktif. Sempurna untuk mahasiswa yang mempelajari sistem operasi!
-                    </p>
-                </div>
-            </div>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Section header -->
+        <div class="text-center mb-16">
+          <h2 class="text-4xl sm:text-5xl font-bold mb-4">
+            <span
+              class="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent"
+            >
+              Tentang Platform Ini
+            </span>
+          </h2>
+          <p class="text-xl text-slate-300 max-w-3xl mx-auto">
+            Alat edukatif interaktif yang dirancang untuk membantu Anda
+            menguasai konsep sistem operasi melalui simulasi langsung
+          </p>
         </div>
+
+        <!-- Feature cards -->
+        <div class="max-w-6xl mx-auto">
+          <div class="grid md:grid-cols-3 gap-8">
+            <div
+              class="bg-slate-800/50 border border-slate-700 hover:border-emerald-500/50 rounded-xl p-8 transition-all duration-300 hover:transform hover:scale-105"
+            >
+              <div class="flex justify-center mb-6">
+                <div
+                  class="p-4 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-xl"
+                >
+                  <svg
+                    class="w-10 h-10 text-emerald-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <h3 class="text-xl font-bold text-white mb-4 text-center">
+                Pelajari Manajemen Proses
+              </h3>
+              <p class="text-slate-300 text-center leading-relaxed">
+                Pahami bagaimana sistem operasi mengelola proses dan siklus
+                hidupnya dari pembuatan hingga terminasi.
+              </p>
+            </div>
+
+            <div
+              class="bg-slate-800/50 border border-slate-700 hover:border-emerald-500/50 rounded-xl p-8 transition-all duration-300 hover:transform hover:scale-105"
+            >
+              <div class="flex justify-center mb-6">
+                <div
+                  class="p-4 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-xl"
+                >
+                  <svg
+                    class="w-10 h-10 text-emerald-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <h3 class="text-xl font-bold text-white mb-4 text-center">
+                Praktik Algoritma Penjadwalan
+              </h3>
+              <p class="text-slate-300 text-center leading-relaxed">
+                Bereksperimen dengan algoritma penjadwalan FCFS, SJF, Priority,
+                dan Round Robin secara real-time.
+              </p>
+            </div>
+
+            <div
+              class="bg-slate-800/50 border border-slate-700 hover:border-emerald-500/50 rounded-xl p-8 transition-all duration-300 hover:transform hover:scale-105"
+            >
+              <div class="flex justify-center mb-6">
+                <div
+                  class="p-4 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-xl"
+                >
+                  <svg
+                    class="w-10 h-10 text-emerald-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <h3 class="text-xl font-bold text-white mb-4 text-center">
+                Visualisasi Transisi Status
+              </h3>
+              <p class="text-slate-300 text-center leading-relaxed">
+                Lihat bagaimana proses berpindah antara status New, Ready,
+                Running, Waiting, dan Terminated langkah demi langkah.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional info -->
+        <div class="mt-16 text-center">
+          <div
+            class="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/30 rounded-2xl p-8 max-w-4xl mx-auto"
+          >
+            <h3 class="text-2xl font-bold text-white mb-4">
+              Apa yang Akan Anda Pelajari
+            </h3>
+            <p class="text-slate-300 leading-relaxed">
+              Platform ini memberikan pemahaman komprehensif tentang manajemen
+              proses dalam sistem operasi. Anda akan mempelajari cara kerja
+              berbagai algoritma penjadwalan, bagaimana proses bertransisi
+              antara berbagai status, dan mendapatkan pengalaman praktis melalui
+              simulasi interaktif. Sempurna untuk mahasiswa yang mempelajari
+              sistem operasi!
+            </p>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Materi Section -->
-    <section id="materi" class="py-20 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-            <!-- Section header -->
-            <div class="text-center mb-16">
-                <h2 class="text-4xl sm:text-5xl font-bold mb-4">
-                    <span class="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
-                        Materi Pembelajaran
-                    </span>
-                </h2>
-                <p class="text-xl text-slate-300 max-w-3xl mx-auto">
-                    Kuasai fundamental manajemen proses dan algoritma penjadwalan
-                </p>
+    <section
+      id="materi"
+      class="py-20 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"
+    >
+      <!-- Section header -->
+      <div class="text-center mb-16">
+        <h2 class="text-4xl sm:text-5xl font-bold mb-4">
+          <span
+            class="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent"
+          >
+            Materi Pembelajaran
+          </span>
+        </h2>
+        <p class="text-xl text-slate-300 max-w-3xl mx-auto">
+          Kuasai fundamental manajemen proses dan algoritma penjadwalan
+        </p>
+      </div>
+
+      <!-- Process States -->
+      <div class="mb-20">
+        <h3 class="text-3xl font-bold text-white mb-8 text-center">
+          Status Proses
+        </h3>
+
+        <!-- GRID FULL CENTER & IDENTIK -->
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mx-auto max-w-6xl place-items-center"
+        >
+          <!-- New -->
+          <div
+            class="bg-slate-800/50 border border-purple-500/50 rounded-xl p-6 hover:transform hover:scale-105 transition-all duration-300 w-full h-[270px] flex flex-col justify-between"
+          >
+            <div
+              class="w-16 h-16 mx-auto mb-4 rounded-xl bg-purple-500/20 flex items-center justify-center"
+            >
+              <svg
+                class="w-8 h-8 text-purple-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
             </div>
+            <h4 class="text-center text-white font-bold">New</h4>
+            <p class="text-slate-300 text-sm text-center leading-relaxed">
+              Proses baru dibuat oleh sistem dan sedang dipersiapkan sebelum
+              masuk ke antrian Ready untuk dieksekusi.
+            </p>
+          </div>
 
-            <!-- Process States -->
-                <div class="mb-20">
-                    <h3 class="text-3xl font-bold text-white mb-8 text-center">Status Proses</h3>
-
-                    <!-- GRID FULL CENTER & IDENTIK -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mx-auto max-w-6xl place-items-center">
-
-                        <!-- New -->
-                        <div class="bg-slate-800/50 border border-purple-500/50 rounded-xl p-6 
-                                    hover:transform hover:scale-105 transition-all duration-300
-                                    w-full h-[270px] flex flex-col justify-between">
-                            <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-purple-500/20 flex items-center justify-center">
-                                <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 4v16m8-8H4" />
-                                </svg>
-                            </div>
-                            <h4 class="text-center text-white font-bold">New</h4>
-                            <p class="text-slate-300 text-sm text-center leading-relaxed">
-                                Proses baru dibuat oleh sistem dan sedang dipersiapkan sebelum masuk ke antrian Ready untuk dieksekusi.
-                            </p>
-                        </div>
-
-                        <!-- Ready -->
-                        <div class="bg-slate-800/50 border border-blue-500/50 rounded-xl p-6 
-                                    hover:transform hover:scale-105 transition-all duration-300
-                                    w-full h-[270px] flex flex-col justify-between">
-                            <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-blue-500/20 flex items-center justify-center">
-                                <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                            </div>
-                            <h4 class="text-center text-white font-bold">Ready</h4>
-                            <p class="text-slate-300 text-sm text-center leading-relaxed">
-                                Proses telah disiapkan dan menunggu dalam antrian untuk ditugaskan ke CPU untuk eksekusi.
-                            </p>
-                        </div>
-
-                        <!-- Running -->
-                        <div class="bg-slate-800/50 border border-emerald-500/50 rounded-xl p-6 
-                                    hover:transform hover:scale-105 transition-all duration-300
-                                    w-full h-[270px] flex flex-col justify-between">
-                            <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-                                <svg class="w-8 h-8 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                            </div>
-                            <h4 class="text-center text-white font-bold">Running</h4>
-                            <p class="text-slate-300 text-sm text-center leading-relaxed">
-                                Proses sedang dieksekusi oleh CPU dan secara aktif melakukan instruksinya.
-                            </p>
-                        </div>
-
-                        <!-- Waiting -->
-                        <div class="bg-slate-800/50 border border-amber-500/50 rounded-xl p-6 
-                                    hover:transform hover:scale-105 transition-all duration-300
-                                    w-full h-[270px] flex flex-col justify-between">
-                            <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-amber-500/20 flex items-center justify-center">
-                                <svg class="w-8 h-8 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                            </div>
-                            <h4 class="text-center text-white font-bold">Waiting</h4>
-                            <p class="text-slate-300 text-sm text-center leading-relaxed">
-                                Proses diblokir dan menunggu suatu kejadian terjadi (operasi I/O, ketersediaan resource).
-                            </p>
-                        </div>
-
-                        <!-- Terminated -->
-                        <div class="bg-slate-800/50 border border-slate-500/50 rounded-xl p-6 
-                                    hover:transform hover:scale-105 transition-all duration-300
-                                    w-full h-[270px] flex flex-col justify-between">
-                            <div class="w-16 h-16 mx-auto mb-4 rounded-xl bg-slate-500/20 flex items-center justify-center">
-                                <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                            </div>
-                            <h4 class="text-center text-white font-bold">Terminated</h4>
-                            <p class="text-slate-300 text-sm text-center leading-relaxed">
-                                Proses telah selesai eksekusi dan semua resource telah dilepaskan oleh sistem.
-                            </p>
-                        </div>
-
-                    </div>
-                </div>
-
-            <!-- State transition flow -->
-            <div class="max-w-6xl mx-auto">
-                <div class="bg-slate-800/30 border border-slate-500/50 rounded-xl p-6 w-full justify-between">
-                    <!-- <div class="mt-12 bg-slate-800/30 border border-slate-700 rounded-2xl p-8"></div> -->
-                    <h4 class="text-xl font-bold text-white mb-6 text-center">Alur Transisi Status</h4>
-                    <div class="flex flex-wrap items-center justify-center gap-4">
-                        <div class="px-6 py-3 bg-purple-500/20 border border-purple-500/50 rounded-lg text-purple-400 font-semibold">
-                            New
-                        </div>
-                        <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                        </svg>
-                        <div class="px-6 py-3 bg-blue-500/20 border border-blue-500/50 rounded-lg text-blue-400 font-semibold">
-                            Ready
-                        </div>
-                        <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                        </svg>
-                        <div class="px-6 py-3 bg-emerald-500/20 border border-emerald-500/50 rounded-lg text-emerald-400 font-semibold">
-                            Running
-                        </div>
-                        <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                        </svg>
-                        <div class="px-6 py-3 bg-amber-500/20 border border-amber-500/50 rounded-lg text-amber-400 font-semibold">
-                            Waiting
-                        </div>
-                        <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                        </svg>
-                        <div class="px-6 py-3 bg-slate-500/20 border border-slate-500/50 rounded-lg text-slate-400 font-semibold">
-                            Terminated
-                        </div>
-                    </div>
-                </div>
+          <!-- Ready -->
+          <div
+            class="bg-slate-800/50 border border-blue-500/50 rounded-xl p-6 hover:transform hover:scale-105 transition-all duration-300 w-full h-[270px] flex flex-col justify-between"
+          >
+            <div
+              class="w-16 h-16 mx-auto mb-4 rounded-xl bg-blue-500/20 flex items-center justify-center"
+            >
+              <svg
+                class="w-8 h-8 text-blue-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
             </div>
+            <h4 class="text-center text-white font-bold">Ready</h4>
+            <p class="text-slate-300 text-sm text-center leading-relaxed">
+              Proses telah disiapkan dan menunggu dalam antrian untuk ditugaskan
+              ke CPU untuk eksekusi.
+            </p>
+          </div>
 
-            <!-- Scheduling Algorithms -->
-            <div class="max-w-6xl mx-auto mt-20 mb-20">
-                <h3 class="text-3xl font-bold text-white mb-8 text-center">Algoritma Penjadwalan</h3>
-
-                <div class="grid md:grid-cols-2 gap-6 items-stretch">
-
-                    <div class="bg-slate-800/50 border border-slate-700 hover:border-emerald-500/50 
-                                rounded-xl p-6 transition-all duration-300 h-full flex flex-col">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="px-3 py-1 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 
-                                        border border-emerald-500/30 rounded-lg">
-                                <span class="text-emerald-400 font-bold">FCFS</span>
-                            </div>
-                        </div>
-                        <h4 class="text-xl font-bold text-white mb-3">First Come First Serve</h4>
-                        <p class="text-slate-300 leading-relaxed">
-                            Proses dieksekusi dalam urutan kedatangannya. Sederhana tetapi dapat menyebabkan convoy effect.
-                        </p>
-                    </div>
-
-                    <div class="bg-slate-800/50 border border-slate-700 hover:border-emerald-500/50 
-                                rounded-xl p-6 transition-all duration-300 h-full flex flex-col">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="px-3 py-1 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 
-                                        border border-emerald-500/30 rounded-lg">
-                                <span class="text-emerald-400 font-bold">SJF</span>
-                            </div>
-                        </div>
-                        <h4 class="text-xl font-bold text-white mb-3">Shortest Job First</h4>
-                        <p class="text-slate-300 leading-relaxed">
-                            Proses dengan burst time terpendek dieksekusi terlebih dahulu. Meminimalkan rata-rata waktu tunggu.
-                        </p>
-                    </div>
-
-                    <div class="bg-slate-800/50 border border-slate-700 hover:border-emerald-500/50 
-                                rounded-xl p-6 transition-all duration-300 h-full flex flex-col">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="px-3 py-1 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 
-                                        border border-emerald-500/30 rounded-lg">
-                                <span class="text-emerald-400 font-bold">Priority</span>
-                            </div>
-                        </div>
-                        <h4 class="text-xl font-bold text-white mb-3">Priority Scheduling</h4>
-                        <p class="text-slate-300 leading-relaxed">
-                            Setiap proses diberi prioritas. Proses dengan prioritas lebih tinggi dieksekusi terlebih dahulu.
-                        </p>
-                    </div>
-
-                    <div class="bg-slate-800/50 border border-slate-700 hover:border-emerald-500/50 
-                                rounded-xl p-6 transition-all duration-300 h-full flex flex-col">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="px-3 py-1 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 
-                                        border border-emerald-500/30 rounded-lg">
-                                <span class="text-emerald-400 font-bold">Round Robin</span>
-                            </div>
-                        </div>
-                        <h4 class="text-xl font-bold text-white mb-3">Round Robin</h4>
-                        <p class="text-slate-300 leading-relaxed">
-                            Setiap proses mendapat time quantum tetap. Memastikan distribusi waktu CPU yang adil.
-                        </p>
-                    </div>
-
-                </div>
+          <!-- Running -->
+          <div
+            class="bg-slate-800/50 border border-emerald-500/50 rounded-xl p-6 hover:transform hover:scale-105 transition-all duration-300 w-full h-[270px] flex flex-col justify-between"
+          >
+            <div
+              class="w-16 h-16 mx-auto mb-4 rounded-xl bg-emerald-500/20 flex items-center justify-center"
+            >
+              <svg
+                class="w-8 h-8 text-emerald-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
             </div>
-    </section>
-    </style>
-</head>
-<body class="bg-slate-950 text-white">
+            <h4 class="text-center text-white font-bold">Running</h4>
+            <p class="text-slate-300 text-sm text-center leading-relaxed">
+              Proses sedang dieksekusi oleh CPU dan secara aktif melakukan
+              instruksinya.
+            </p>
+          </div>
 
-    <main class="py-20 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <!-- Waiting -->
+          <div
+            class="bg-slate-800/50 border border-amber-500/50 rounded-xl p-6 hover:transform hover:scale-105 transition-all duration-300 w-full h-[270px] flex flex-col justify-between"
+          >
+            <div
+              class="w-16 h-16 mx-auto mb-4 rounded-xl bg-amber-500/20 flex items-center justify-center"
+            >
+              <svg
+                class="w-8 h-8 text-amber-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <h4 class="text-center text-white font-bold">Waiting</h4>
+            <p class="text-slate-300 text-sm text-center leading-relaxed">
+              Proses diblokir dan menunggu suatu kejadian terjadi (operasi I/O,
+              ketersediaan resource).
+            </p>
+          </div>
 
-            <!-- (Hero / About / Materi sections kept minimal here for brevity; you can keep original content) -->
-            <!-- Simulasi Section -->
-            <section id="simulasi" class="mb-10">
-                <div class="max-w-6xl mx-auto mt-20 mb-20">
-                <div class="bg-slate-800/40 border border-slate-700 rounded-xl p-6 mb-6">
-                    <h2 class="text-2xl font-bold mb-3">Simulasi Penjadwalan Proses</h2>
-                    <p class="text-slate-300 mb-4">Pilih algoritma terlebih dahulu</p>
-
-<!-- ALGORITHM SELECT (appear first, then locked & hidden after selection) -->
-                    <div id="algorithm-select-container" class="mb-4">
-                        <label class="block text-slate-300 mb-2 font-semibold">Pilih Mode Penjadwalan</label>
-                        <div class="flex items-center gap-3">
-                            <select id="algorithm-select" class="w-1/2 bg-slate-900 border border-slate-600 text-white rounded-lg px-4 py-2">
-                                <option value="" disabled selected>-- Pilih algoritma --</option>
-                                <option value="FCFS">FCFS (First Come First Serve)</option>
-                                <option value="SJF">SJF (Shortest Job First)</option>
-                                <option value="Priority">Priority (Preemptive)</option>
-                                <option value="RoundRobin">Round Robin (RR)</option>
-                            </select>
-
-                            <!-- GLOBAL QUANTUM: hanya ditampilkan saat RoundRobin dipilih,
-                                 ini adalah input sekali untuk semua proses -->
-                            <div id="rr-quantum-container" class="hidden flex items-center gap-2">
-                                <label class="text-slate-300 text-sm">Quantum:</label>
-                                <input id="global-quantum" type="number" min="1" placeholder="0"
-                                    class="w-28 bg-slate-900 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm" />
-                            </div>
-
-                            <button id="lock-algo-btn" class="px-4 py-2 bg-emerald-500 text-white rounded-lg">Pilih & Lanjut</button>
-                            <button id="change-algo-btn" class="px-4 py-2 border border-slate-600 text-slate-300 rounded-lg hidden">Ganti Mode</button>
-                            <div id="selected-algo-label" class="ml-auto text-sm text-slate-300"></div>
-                        </div>
-                    </div>
-
-                    <!-- Form & queue area (form will adapt based on selectedAlgorithm) -->
-                    <div id="form-and-queue" class="grid lg:grid-cols-2 gap-6 hidden">
-                        <!-- Dynamic Form -->
-                        <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-6 animate-fadeIn">
-                            <h3 class="text-xl font-bold text-white mb-4">Tambah Proses (<span id="algo-name">-</span>)</h3>
-                            <form id="dynamic-process-form" class="space-y-4">
-                                <div>
-                                    <label class="block text-slate-300 mb-2">Nama Proses</label>
-                                    <input type="text" id="form-process-name" placeholder="misal: P1"
-                                        class="w-full bg-slate-900 border border-slate-600 text-white rounded-lg px-4 py-2" />
-                                </div>
-
-                                <!-- Arrival (shown depending on algo) -->
-                                <div id="field-arrival" class="hidden">
-                                    <label class="block text-slate-300 mb-2">Arrival Time (detik)</label>
-                                    <input type="number" id="form-arrival" min="0" placeholder="0"
-                                        class="w-full bg-slate-900 border border-slate-600 text-white rounded-lg px-4 py-2" />
-                                </div>
-
-                                <!-- Burst (commonly shown) -->
-                                <div id="field-burst">
-                                    <label class="block text-slate-300 mb-2">Burst Time (detik)</label>
-                                    <input type="number" id="form-burst" min="1" placeholder="0"
-                                        class="w-full bg-slate-900 border border-slate-600 text-white rounded-lg px-4 py-2" />
-                                </div>
-
-                                <!-- Priority -->
-                                <div id="field-priority" class="hidden">
-                                    <label class="block text-slate-300 mb-2">Priority (lebih kecil = lebih tinggi)</label>
-                                    <input type="number" id="form-priority" min="1" placeholder="0"
-                                        class="w-full bg-slate-900 border border-slate-600 text-white rounded-lg px-4 py-2" />
-                                </div>
-
-                                <!-- NOTE: field-quantum tetap ada but WILL BE HIDDEN / unused for per-process input.
-                                     We keep it to avoid breaking layout, but adaptFormFieldsByAlgorithm will not show it. -->
-                                <div id="field-quantum" class="hidden">
-                                    <label class="block text-slate-300 mb-2">Quantum Time (detik)</label>
-                                    <input type="number" id="form-quantum" min="1" placeholder="0"
-                                        class="w-full bg-slate-900 border border-slate-600 text-white rounded-lg px-4 py-2" />
-                                </div>
-
-                                <div class="flex items-center gap-3">
-                                    <button type="submit" id="form-add-btn" class="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold px-4 py-2 rounded-lg">
-                                        Tambah Proses
-                                    </button>
-                                    <button type="button" id="form-clear-btn" class="px-4 py-2 border border-slate-600 rounded-lg text-slate-300">Clear</button>
-                                </div>
-                            </form>
-                        </div>
-
-                        <!-- Queue -->
-                        <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-6 animate-fadeIn">
-                            <h3 class="text-xl font-bold text-white mb-4">Antrian Proses (<span id="process-count">0</span>)</h3>
-                            <div id="process-list" class="space-y-3 max-h-56 overflow-y-auto mb-4">
-                                <div class="text-center py-12 text-slate-400">Belum ada proses. Tambahkan proses untuk memulai.</div>
-                            </div>
-
-                            <div class="flex gap-3 mb-4">
-                                <button id="start-simulation-btn" class="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold px-4 py-2 rounded-lg">Mulai Simulasi</button>
-                                <button id="reset-btn" class="px-4 py-2 border border-slate-600 rounded-lg text-slate-300">Reset</button>
-                            </div>
-
-                            <p class="text-sm text-slate-400">Setelah memilih mode, masukkan proses sebanyak yang dibutuhkan lalu tekan <strong>Mulai Simulasi</strong>.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Simulation Area (hidden until Start) -->
-                <div id="simulation-area" class="hidden bg-slate-800/40 border border-slate-700 rounded-xl p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h4 class="text-lg font-bold">Progress Simulasi — <span id="sim-algo-label"></span></h4>
-                        <div class="text-sm text-slate-300">
-                            <span id="step-counter">Step 0 / 0</span> — Waktu: <span id="current-time">0</span>s
-                        </div>
-                    </div>
-
-                    <div id="step-desc" class="mb-4 p-3 bg-slate-900/50 rounded border border-slate-700 text-slate-200">—</div>
-
-                    <!-- Dynamic table header -->
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead id="table-header">
-                                <!-- Filled dynamically -->
-                            </thead>
-                            <tbody id="process-table-body"></tbody>
-                        </table>
-                    </div>
-
-                    <!-- navigation -->
-                    <div class="flex items-center justify-center gap-4 mt-6">
-                        <button id="prev-step-btn" class="px-4 py-2 rounded bg-slate-700 disabled:opacity-50" disabled>Previous</button>
-                        <button id="next-step-btn" class="px-4 py-2 rounded bg-emerald-500 text-white disabled:opacity-50" disabled>Next</button>
-                        <button id="stop-sim-btn" class="px-4 py-2 rounded border border-slate-600 text-slate-300">Stop</button>
-                    </div>
-                </div>
-                </div>
-            </section>
-
+          <!-- Terminated -->
+          <div
+            class="bg-slate-800/50 border border-slate-500/50 rounded-xl p-6 hover:transform hover:scale-105 transition-all duration-300 w-full h-[270px] flex flex-col justify-between"
+          >
+            <div
+              class="w-16 h-16 mx-auto mb-4 rounded-xl bg-slate-500/20 flex items-center justify-center"
+            >
+              <svg
+                class="w-8 h-8 text-slate-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <h4 class="text-center text-white font-bold">Terminated</h4>
+            <p class="text-slate-300 text-sm text-center leading-relaxed">
+              Proses telah selesai eksekusi dan semua resource telah dilepaskan
+              oleh sistem.
+            </p>
+          </div>
         </div>
+      </div>
+
+      <!-- State transition flow -->
+      <div class="max-w-6xl mx-auto">
+        <div
+          class="bg-slate-800/30 border border-slate-500/50 rounded-xl p-6 w-full justify-between"
+        >
+          <!-- <div class="mt-12 bg-slate-800/30 border border-slate-700 rounded-2xl p-8"></div> -->
+          <h4 class="text-xl font-bold text-white mb-6 text-center">
+            Alur Transisi Status
+          </h4>
+          <div class="flex flex-wrap items-center justify-center gap-4">
+            <div
+              class="px-6 py-3 bg-purple-500/20 border border-purple-500/50 rounded-lg text-purple-400 font-semibold"
+            >
+              New
+            </div>
+            <svg
+              class="w-6 h-6 text-slate-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+            <div
+              class="px-6 py-3 bg-blue-500/20 border border-blue-500/50 rounded-lg text-blue-400 font-semibold"
+            >
+              Ready
+            </div>
+            <svg
+              class="w-6 h-6 text-slate-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+            <div
+              class="px-6 py-3 bg-emerald-500/20 border border-emerald-500/50 rounded-lg text-emerald-400 font-semibold"
+            >
+              Running
+            </div>
+            <svg
+              class="w-6 h-6 text-slate-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+            <div
+              class="px-6 py-3 bg-amber-500/20 border border-amber-500/50 rounded-lg text-amber-400 font-semibold"
+            >
+              Waiting
+            </div>
+            <svg
+              class="w-6 h-6 text-slate-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+            <div
+              class="px-6 py-3 bg-slate-500/20 border border-slate-500/50 rounded-lg text-slate-400 font-semibold"
+            >
+              Terminated
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scheduling Algorithms -->
+      <div class="max-w-6xl mx-auto mt-20 mb-20">
+        <h3 class="text-3xl font-bold text-white mb-8 text-center">
+          Algoritma Penjadwalan
+        </h3>
+
+        <div class="grid md:grid-cols-2 gap-6 items-stretch">
+          <div
+            class="bg-slate-800/50 border border-slate-700 hover:border-emerald-500/50 rounded-xl p-6 transition-all duration-300 h-full flex flex-col"
+          >
+            <div class="flex items-center gap-3 mb-4">
+              <div
+                class="px-3 py-1 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 rounded-lg"
+              >
+                <span class="text-emerald-400 font-bold">FCFS</span>
+              </div>
+            </div>
+            <h4 class="text-xl font-bold text-white mb-3">
+              First Come First Serve
+            </h4>
+            <p class="text-slate-300 leading-relaxed">
+              Proses dieksekusi dalam urutan kedatangannya. Sederhana tetapi
+              dapat menyebabkan convoy effect.
+            </p>
+          </div>
+
+          <div
+            class="bg-slate-800/50 border border-slate-700 hover:border-emerald-500/50 rounded-xl p-6 transition-all duration-300 h-full flex flex-col"
+          >
+            <div class="flex items-center gap-3 mb-4">
+              <div
+                class="px-3 py-1 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 rounded-lg"
+              >
+                <span class="text-emerald-400 font-bold">SJF</span>
+              </div>
+            </div>
+            <h4 class="text-xl font-bold text-white mb-3">
+              Shortest Job First
+            </h4>
+            <p class="text-slate-300 leading-relaxed">
+              Proses dengan burst time terpendek dieksekusi terlebih dahulu.
+              Meminimalkan rata-rata waktu tunggu.
+            </p>
+          </div>
+
+          <div
+            class="bg-slate-800/50 border border-slate-700 hover:border-emerald-500/50 rounded-xl p-6 transition-all duration-300 h-full flex flex-col"
+          >
+            <div class="flex items-center gap-3 mb-4">
+              <div
+                class="px-3 py-1 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 rounded-lg"
+              >
+                <span class="text-emerald-400 font-bold">Priority</span>
+              </div>
+            </div>
+            <h4 class="text-xl font-bold text-white mb-3">
+              Priority Scheduling
+            </h4>
+            <p class="text-slate-300 leading-relaxed">
+              Setiap proses diberi prioritas. Proses dengan prioritas lebih
+              tinggi dieksekusi terlebih dahulu.
+            </p>
+          </div>
+
+          <div
+            class="bg-slate-800/50 border border-slate-700 hover:border-emerald-500/50 rounded-xl p-6 transition-all duration-300 h-full flex flex-col"
+          >
+            <div class="flex items-center gap-3 mb-4">
+              <div
+                class="px-3 py-1 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 rounded-lg"
+              >
+                <span class="text-emerald-400 font-bold">Round Robin</span>
+              </div>
+            </div>
+            <h4 class="text-xl font-bold text-white mb-3">Round Robin</h4>
+            <p class="text-slate-300 leading-relaxed">
+              Setiap proses mendapat time quantum tetap. Memastikan distribusi
+              waktu CPU yang adil.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <main
+      class="py-20 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- (Hero / About / Materi sections kept minimal here for brevity; you can keep original content) -->
+        <!-- Simulasi Section -->
+        <section id="simulasi" class="mb-10">
+          <div class="max-w-6xl mx-auto mt-20 mb-20">
+            <div
+              class="bg-slate-800/40 border border-slate-700 rounded-xl p-6 mb-6"
+            >
+              <h2 class="text-2xl font-bold mb-3">
+                Simulasi Penjadwalan Proses
+              </h2>
+              <p class="text-slate-300 mb-4" id="select-info">
+                Pilih algoritma terlebih dahulu
+              </p>
+
+              <!-- ALGORITHM SELECT (appear first, then locked & hidden after selection) -->
+              <div id="algorithm-select-container" class="mb-4">
+                <label class="block text-slate-300 mb-2 font-semibold"
+                  >Pilih Mode Penjadwalan</label
+                >
+                <div class="flex items-center gap-3">
+                  <select
+                    id="algorithm-select"
+                    class="w-1/2 bg-slate-900 border border-slate-600 text-white rounded-lg px-4 py-2"
+                  >
+                    <option value="" disabled selected>
+                      -- Pilih algoritma --
+                    </option>
+                    <option value="FCFS">FCFS (First Come First Serve)</option>
+                    <option value="SJF">SJF (Shortest Job First)</option>
+                    <option value="Priority">Priority (Preemptive)</option>
+                    <option value="RoundRobin">Round Robin (RR)</option>
+                  </select>
+
+                  <!-- GLOBAL QUANTUM: hanya ditampilkan saat RoundRobin dipilih,
+                                 ini adalah input sekali untuk semua proses -->
+                  <div
+                    id="rr-quantum-container"
+                    class="hidden flex items-center gap-2"
+                  >
+                    <label class="text-slate-300 text-sm">Quantum:</label>
+                    <input
+                      id="global-quantum"
+                      type="number"
+                      min="1"
+                      placeholder="0"
+                      class="w-28 bg-slate-900 border border-slate-600 text-white rounded-lg px-3 py-2 text-sm"
+                    />
+                  </div>
+
+                  <button
+                    id="lock-algo-btn"
+                    class="px-4 py-2 bg-emerald-500 text-white rounded-lg"
+                  >
+                    Pilih & Lanjut
+                  </button>
+                  <button
+                    id="change-algo-btn"
+                    class="px-4 py-2 border border-slate-600 text-slate-300 rounded-lg hidden"
+                  >
+                    Ganti Mode
+                  </button>
+                  <div
+                    id="selected-algo-label"
+                    class="ml-auto text-sm text-slate-300"
+                  ></div>
+                </div>
+              </div>
+
+              <!-- Form & queue area (form will adapt based on selectedAlgorithm) -->
+              <div id="form-and-queue" class="grid lg:grid-cols-2 gap-6 hidden">
+                <!-- Dynamic Form -->
+                <div
+                  class="bg-slate-800/50 border border-slate-700 rounded-xl p-6 animate-fadeIn"
+                >
+                  <h3 class="text-xl font-bold text-white mb-4">
+                    Tambah Proses (<span id="algo-name">-</span>)
+                  </h3>
+                  <form id="dynamic-process-form" class="space-y-4">
+                    <!-- Quantum display (read-only for Round Robin) -->
+                    <div id="field-quantum-display" class="hidden">
+                      <label class="block text-slate-300 mb-2"
+                        >Quantum (detik)</label
+                      >
+                      <input
+                        type="number"
+                        id="form-quantum-display"
+                        disabled
+                        class="w-full bg-slate-900 border border-slate-600 text-white rounded-lg px-4 py-2 opacity-60 cursor-not-allowed"
+                      />
+                    </div>
+
+                    <div>
+                      <label class="block text-slate-300 mb-2"
+                        >Nama Proses</label
+                      >
+                      <input
+                        type="text"
+                        id="form-process-name"
+                        placeholder="misal: P1"
+                        class="w-full bg-slate-900 border border-slate-600 text-white rounded-lg px-4 py-2"
+                      />
+                    </div>
+
+                    <!-- Arrival (shown depending on algo) -->
+                    <div id="field-arrival" class="hidden">
+                      <label class="block text-slate-300 mb-2"
+                        >Arrival Time (detik)</label
+                      >
+                      <input
+                        type="number"
+                        id="form-arrival"
+                        min="0"
+                        placeholder="0"
+                        class="w-full bg-slate-900 border border-slate-600 text-white rounded-lg px-4 py-2"
+                      />
+                    </div>
+
+                    <!-- Burst (commonly shown) -->
+                    <div id="field-burst">
+                      <label class="block text-slate-300 mb-2"
+                        >Burst Time (detik)</label
+                      >
+                      <input
+                        type="number"
+                        id="form-burst"
+                        min="1"
+                        placeholder="0"
+                        class="w-full bg-slate-900 border border-slate-600 text-white rounded-lg px-4 py-2"
+                      />
+                    </div>
+
+                    <!-- Priority -->
+                    <div id="field-priority" class="hidden">
+                      <label class="block text-slate-300 mb-2"
+                        >Priority (lebih kecil = lebih tinggi)</label
+                      >
+                      <input
+                        type="number"
+                        id="form-priority"
+                        min="1"
+                        placeholder="0"
+                        class="w-full bg-slate-900 border border-slate-600 text-white rounded-lg px-4 py-2"
+                      />
+                    </div>
+
+                    <!-- NOTE: field-quantum tetap ada but WILL BE HIDDEN / unused for per-process input.
+                                     We keep it to avoid breaking layout, but adaptFormFieldsByAlgorithm will not show it. -->
+                    <div id="field-quantum" class="hidden">
+                      <label class="block text-slate-300 mb-2"
+                        >Quantum Time (detik)</label
+                      >
+                      <input
+                        type="number"
+                        id="form-quantum"
+                        min="1"
+                        placeholder="0"
+                        class="w-full bg-slate-900 border border-slate-600 text-white rounded-lg px-4 py-2"
+                      />
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                      <button
+                        type="submit"
+                        id="form-add-btn"
+                        class="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold px-4 py-2 rounded-lg"
+                      >
+                        Tambah Proses
+                      </button>
+                      <button
+                        type="button"
+                        id="form-clear-btn"
+                        class="px-4 py-2 border border-slate-600 rounded-lg text-slate-300"
+                      >
+                        Clear
+                      </button>
+                    </div>
+                  </form>
+                </div>
+
+                <!-- Queue -->
+                <div
+                  class="bg-slate-800/50 border border-slate-700 rounded-xl p-6 animate-fadeIn"
+                >
+                  <h3 class="text-xl font-bold text-white mb-4">
+                    Antrian Proses (<span id="process-count">0</span>)
+                  </h3>
+                  <div
+                    id="process-list"
+                    class="space-y-3 max-h-56 overflow-y-auto mb-4"
+                  >
+                    <div class="text-center py-12 text-slate-400">
+                      Belum ada proses. Tambahkan proses untuk memulai.
+                    </div>
+                  </div>
+
+                  <div class="flex gap-3 mb-4">
+                    <button
+                      id="start-simulation-btn"
+                      class="flex-1 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold px-4 py-2 rounded-lg"
+                    >
+                      Mulai Simulasi
+                    </button>
+                    <button
+                      id="reset-btn"
+                      class="px-4 py-2 border border-slate-600 rounded-lg text-slate-300"
+                    >
+                      Reset
+                    </button>
+                  </div>
+
+                  <p class="text-sm text-slate-400">
+                    Setelah memilih mode, masukkan proses sebanyak yang
+                    dibutuhkan lalu tekan <strong>Mulai Simulasi</strong>.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Simulation Area (hidden until Start) -->
+            <div
+              id="simulation-area"
+              class="hidden bg-slate-800/40 border border-slate-700 rounded-xl p-6"
+            >
+              <div class="flex items-center justify-between mb-4">
+                <h4 class="text-lg font-bold">
+                  Progress Simulasi — <span id="sim-algo-label"></span>
+                </h4>
+                <div class="text-sm text-slate-300">
+                  <span id="step-counter">Step 0 / 0</span> — Waktu:
+                  <span id="current-time">0</span>s
+                </div>
+              </div>
+
+              <div
+                id="step-desc"
+                class="mb-4 p-3 bg-slate-900/50 rounded border border-slate-700 text-slate-200"
+              >
+                —
+              </div>
+
+              <!-- Dynamic table header -->
+              <div class="overflow-x-auto">
+                <table class="w-full">
+                  <thead id="table-header">
+                    <!-- Filled dynamically -->
+                  </thead>
+                  <tbody id="process-table-body"></tbody>
+                </table>
+              </div>
+
+              <!-- navigation -->
+              <div class="flex items-center justify-center gap-4 mt-6">
+                <button
+                  id="prev-step-btn"
+                  class="px-4 py-2 rounded bg-slate-700 disabled:opacity-50"
+                  disabled
+                >
+                  Previous
+                </button>
+                <button
+                  id="next-step-btn"
+                  class="px-4 py-2 rounded bg-emerald-500 text-white disabled:opacity-50"
+                  disabled
+                >
+                  Next
+                </button>
+                <button
+                  id="stop-sim-btn"
+                  class="px-4 py-2 rounded border border-slate-600 text-slate-300"
+                >
+                  Stop
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
     </main>
 
     <footer class="bg-slate-950 border-t border-slate-800 py-8">
-        <div class="max-w-7xl mx-auto px-4 text-slate-400 text-sm">
-            Dibuat oleh <span class="text-emerald-400 font-semibold">Kelompok 7</span> — OS Process Manager
-        </div>
+      <div class="max-w-7xl mx-auto px-4 text-slate-400 text-sm">
+        Dibuat oleh
+        <span class="text-emerald-400 font-semibold">Kelompok 7</span> — OS
+        Process Manager
+      </div>
     </footer>
 
     <div id="toast" class="toast"></div>
 
-     <!-- Custom Script -->
+    <!-- Custom Script -->
     <script src="script.js"></script>
-    <!-- <script>
-    /**********************
-     * Global state
-     **********************/
-    let selectedAlgorithm = null; // 'FCFS' | 'SJF' | 'Priority' | 'RoundRobin'
-    let processes = [];
-    let simulationSteps = [];
-    let currentStep = 0;
-    let simInterval = null;
-
-    /**********************
-     * Init
-     **********************/
-    document.addEventListener('DOMContentLoaded', () => {
-        initAlgorithmSelection();
-        initFormHandlers();
-        initSimulationControls();
-        renderProcessList();
-    });
-
-    /**********************
-     * Utilities & UI helpers
-     **********************/
-    function uid(){ return Date.now() + Math.floor(Math.random()*1000); }
-    function showToast(msg, type='success'){
-        const t = document.getElementById('toast');
-        t.textContent = msg;
-        t.className = 'toast show' + (type==='error' ? ' error' : '');
-        setTimeout(()=> t.classList.remove('show'), 3000);
-    }
-    function deepSnapshot(arr){
-        return arr.map(p => ({ id:p.id, name:p.name, arrivalTime:p.arrivalTime, burstTime:p.burstTime, remainingTime:p.remainingTime, priority:p.priority, status:p.status }));
-    }
-
-    /**********************
-     * Algorithm selection UI
-     **********************/
-    function initAlgorithmSelection(){
-        const algoSelect = document.getElementById('algorithm-select');
-        const lockBtn = document.getElementById('lock-algo-btn');
-        const changeBtn = document.getElementById('change-algo-btn');
-        const selectedLabel = document.getElementById('selected-algo-label');
-        const rrQuantumContainer = document.getElementById('rr-quantum-container');
-
-        // show/hide global quantum input when user changes the select (before locking)
-        algoSelect.addEventListener('change', () => {
-            if (algoSelect.value === 'RoundRobin') {
-                rrQuantumContainer.classList.remove('hidden');
-            } else {
-                rrQuantumContainer.classList.add('hidden');
-            }
-        });
-
-        lockBtn.addEventListener('click', () => {
-            const val = algoSelect.value;
-            if (!val) { showToast('Pilih algoritma terlebih dahulu', 'error'); return; }
-            // set selected algorithm, hide selection and show form
-            selectedAlgorithm = val;
-            document.getElementById('algorithm-select-container').classList.add('hidden');
-            document.getElementById('form-and-queue').classList.remove('hidden');
-            document.getElementById('algo-name').textContent = labelForAlgo(val);
-            selectedLabel.textContent = `Mode: ${labelForAlgo(val)}`;
-            changeBtn.classList.remove('hidden');
-            // update form fields according to selectedAlgorithm
-            adaptFormFieldsByAlgorithm();
-
-            // If RoundRobin selected, keep rrQuantumContainer visible in UI? We hide the global quantum input after lock,
-            // but we still use its value. We'll hide it to indicate it's locked.
-            if (selectedAlgorithm === 'RoundRobin') {
-                // hide global quantum input (locked) but keep its value used by simulation
-                rrQuantumContainer.classList.add('hidden');
-                showToast(`Round Robin dipilih — Quantum = ${getGlobalQuantum()}s`);
-            }
-        });
-
-        changeBtn.addEventListener('click', () => {
-            // show selection again and clear any pending processes
-            selectedAlgorithm = null;
-            document.getElementById('algorithm-select-container').classList.remove('hidden');
-            document.getElementById('form-and-queue').classList.add('hidden');
-            document.getElementById('algorithm-select').value = '';
-            document.getElementById('selected-algo-label').textContent = '';
-            changeBtn.classList.add('hidden');
-            processes = [];
-            renderProcessList();
-            // show rr quantum input hidden earlier
-            rrQuantumContainer.classList.add('hidden');
-            showToast('Mode penjadwalan dikembalikan. Pilih mode baru jika perlu.');
-        });
-    }
-
-    function labelForAlgo(key){
-        switch(key){
-            case 'FCFS': return 'FCFS (First Come First Serve)';
-            case 'SJF': return 'SJF (Shortest Job First)';
-            case 'Priority': return 'Priority (Preemptive)';
-            case 'RoundRobin': return 'Round Robin (RR)';
-            default: return '-';
-        }
-    }
-
-    function getGlobalQuantum(){
-        const qInput = document.getElementById('global-quantum');
-        const q = parseInt(qInput?.value);
-        return (!isNaN(q) && q > 0) ? q : 2;
-    }
-
-    /**********************
-     * Dynamic form handlers
-     **********************/
-    function initFormHandlers(){
-        const form = document.getElementById('dynamic-process-form');
-        document.getElementById('form-clear-btn').addEventListener('click', ()=> form.reset());
-
-        form.addEventListener('submit', (e)=>{
-            e.preventDefault();
-            if (!selectedAlgorithm) { showToast('Pilih algoritma terlebih dahulu', 'error'); return; }
-            addProcessFromForm();
-        });
-    }
-
-    function adaptFormFieldsByAlgorithm(){
-        // Show/hide fields depending on selectedAlgorithm
-        const fArrival = document.getElementById('field-arrival');
-        const fBurst = document.getElementById('field-burst');
-        const fPriority = document.getElementById('field-priority');
-        const fQuantum = document.getElementById('field-quantum');
-
-        // default hide all, then enable specific ones
-        fArrival.classList.add('hidden');
-        fBurst.classList.remove('hidden');
-        fPriority.classList.add('hidden');
-        fQuantum.classList.add('hidden'); // ensure per-process quantum not used
-
-        if (selectedAlgorithm === 'FCFS') {
-            fArrival.classList.remove('hidden'); // FCFS needs arrival
-        } else if (selectedAlgorithm === 'SJF') {
-            fArrival.classList.remove('hidden'); // allow arrival input for SJF as well
-        } else if (selectedAlgorithm === 'Priority') {
-            fArrival.classList.remove('hidden');
-            fPriority.classList.remove('hidden');
-        } else if (selectedAlgorithm === 'RoundRobin') {
-            fArrival.classList.remove('hidden');
-            // DO NOT show per-process quantum; quantum is global (input moved to algorithm-select area)
-        }
-        // reset form fields to defaults for convenience
-        document.getElementById('dynamic-process-form').reset();
-        // we do not set per-process quantum
-    }
-
-    function addProcessFromForm(){
-        const name = document.getElementById('form-process-name').value.trim();
-        const burst = parseInt(document.getElementById('form-burst').value);
-        const arrivalRaw = document.getElementById('form-arrival').value;
-        const arrival = arrivalRaw === '' ? 0 : parseInt(arrivalRaw);
-        const priority = parseInt(document.getElementById('form-priority').value) || 1;
-
-        if (!name || !burst || isNaN(arrival)) {
-            showToast('Mohon isi field yang diperlukan dengan benar', 'error');
-            return;
-        }
-
-        // Important: process starts as 'New' and will move to 'Ready' when arrival time tercapai selama simulasi
-        const p = {
-            id: uid(),
-            name,
-            burstTime: burst,
-            remainingTime: burst,
-            arrivalTime: arrival,
-            priority,
-            status: 'New' // start as New
-        };
-
-        processes.push(p);
-        renderProcessList();
-        document.getElementById('dynamic-process-form').reset();
-        showToast(`Proses ${name} ditambahkan`);
-    }
-
-    function renderProcessList(){
-        const list = document.getElementById('process-list');
-        const count = document.getElementById('process-count');
-        count.textContent = processes.length;
-        if (processes.length === 0) {
-            list.innerHTML = `<div class="text-center py-12 text-slate-400">Belum ada proses. Tambahkan proses terlebih dahulu.</div>`;
-            return;
-        }
-        const html = processes
-            .slice().sort((a,b)=> a.arrivalTime - b.arrivalTime)
-            .map(p => `
-            <div class="flex items-center justify-between p-3 bg-slate-900/50 rounded-lg border border-slate-700">
-                <div>
-                    <div class="font-semibold">${p.name} <span class="text-xs text-slate-400">(${p.status})</span></div>
-                    <div class="text-sm text-slate-400">Burst: ${p.burstTime}s • Arrival: ${p.arrivalTime}s • Priority: ${p.priority}</div>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button onclick="removeProcess(${p.id})" class="text-red-400 px-2 py-1 rounded">Hapus</button>
-                </div>
-            </div>
-        `).join('');
-        list.innerHTML = html;
-    }
-
-    function removeProcess(id){
-        processes = processes.filter(p => p.id !== id);
-        renderProcessList();
-        showToast('Proses dihapus');
-    }
-
-    /**********************
-     * Simulation controls init
-     **********************/
-    function initSimulationControls(){
-        document.getElementById('start-simulation-btn').addEventListener('click', startSimulation);
-        document.getElementById('reset-btn').addEventListener('click', resetAll);
-        document.getElementById('prev-step-btn').addEventListener('click', ()=> { if (currentStep>0) { currentStep--; renderStep(); }});
-        document.getElementById('next-step-btn').addEventListener('click', ()=> { if (currentStep < simulationSteps.length-1) { currentStep++; renderStep(); }});
-        document.getElementById('stop-sim-btn').addEventListener('click', ()=> { if (simInterval) { clearInterval(simInterval); simInterval = null; showToast('Auto-play dihentikan'); }});
-    }
-
-    function resetAll(){
-        // Reset UI to initial: show algorithm select, hide form area & simulation area
-        selectedAlgorithm = null;
-        processes = [];
-        simulationSteps = [];
-        currentStep = 0;
-        if (simInterval) { clearInterval(simInterval); simInterval = null; }
-        document.getElementById('algorithm-select-container').classList.remove('hidden');
-        document.getElementById('form-and-queue').classList.add('hidden');
-        document.getElementById('simulation-area').classList.add('hidden');
-        document.getElementById('change-algo-btn').classList.add('hidden');
-        document.getElementById('selected-algo-label').textContent = '';
-        document.getElementById('algorithm-select').value = '';
-        // show global quantum input again (in case RR was selected before)
-        document.getElementById('rr-quantum-container')?.classList.add('hidden');
-        renderProcessList();
-        showToast('Sistem di-reset. Pilih mode penjadwalan lagi.');
-    }
-
-    /**********************
-     * Dispatcher: start simulation
-     **********************/
-    function startSimulation(){
-        if (!selectedAlgorithm) { showToast('Pilih algoritma dulu', 'error'); return; }
-        if (processes.length === 0) { showToast('Tambahkan minimal 1 proses', 'error'); return; }
-
-        // Prepare working copy: ensure fresh objects and status 'New' (we already store New)
-        const working = processes.map(p => ({ ...p, remainingTime: p.remainingTime ?? p.burstTime, status: 'New' }));
-        let steps = [];
-        if (selectedAlgorithm === 'FCFS') {
-            steps = simulateFCFS(working);
-        } else if (selectedAlgorithm === 'SJF') {
-            steps = simulateSJF(working);
-        } else if (selectedAlgorithm === 'Priority') {
-            steps = simulatePriorityPreemptive(working);
-        } else if (selectedAlgorithm === 'RoundRobin') {
-            const q = getGlobalQuantum(); // use global quantum (one-time input)
-            steps = simulateRoundRobin(working, q);
-        }
-
-        simulationSteps = steps || [];
-        if (simulationSteps.length === 0) { showToast('Tidak ada langkah simulasi (cek input)', 'error'); return; }
-
-        currentStep = 0;
-        document.getElementById('simulation-area').classList.remove('hidden');
-        document.getElementById('sim-algo-label').textContent = labelForAlgo(selectedAlgorithm);
-        renderStep();
-        showToast('Simulasi dimulai');
-    }
-
-    /**********************
-     * Render step & dynamic table header
-     **********************/
-    function renderStep(){
-        const step = simulationSteps[currentStep];
-        if (!step) return;
-        document.getElementById('step-counter').textContent = `Step ${currentStep+1} / ${simulationSteps.length}`;
-        document.getElementById('current-time').textContent = step.time;
-        document.getElementById('step-desc').textContent = step.description;
-
-        // Build dynamic table header according to selectedAlgorithm
-        const header = document.getElementById('table-header');
-        const tbody = document.getElementById('process-table-body');
-
-        // Columns per algorithm
-        let headHtml = '<tr class="border-b border-slate-700">';
-        headHtml += '<th class="text-left py-3 px-4 text-slate-300 font-semibold">Proses</th>';
-        // Arrival column shown ONLY for FCFS (per request)
-        if (selectedAlgorithm === 'FCFS') {
-            headHtml += '<th class="text-left py-3 px-4 text-slate-300 font-semibold">Arrival</th>';
-        }
-        headHtml += '<th class="text-left py-3 px-4 text-slate-300 font-semibold">Burst</th>';
-        if (selectedAlgorithm === 'SJF' || selectedAlgorithm === 'RoundRobin' || selectedAlgorithm === 'Priority') {
-            headHtml += '<th class="text-left py-3 px-4 text-slate-300 font-semibold">Tersisa</th>';
-        }
-        if (selectedAlgorithm === 'Priority') {
-            headHtml += '<th class="text-left py-3 px-4 text-slate-300 font-semibold">Priority</th>';
-        }
-        headHtml += '<th class="text-left py-3 px-4 text-slate-300 font-semibold">Status</th>';
-        headHtml += '</tr>';
-        header.innerHTML = headHtml;
-
-        // Rows
-        const rows = step.processes
-            .slice()
-            .sort((a,b)=> a.name.localeCompare(b.name))
-            .map(p => {
-                let cols = `<td class="py-3 px-4 text-white font-medium">${p.name}</td>`;
-                if (selectedAlgorithm === 'FCFS') {
-                    cols += `<td class="py-3 px-4 text-slate-300">${p.arrivalTime ?? '-'}</td>`;
-                }
-                cols += `<td class="py-3 px-4 text-slate-300">${p.burstTime ?? '-'}s</td>`;
-                if (selectedAlgorithm === 'SJF' || selectedAlgorithm === 'RoundRobin' || selectedAlgorithm === 'Priority') {
-                    cols += `<td class="py-3 px-4 text-slate-300">${(p.remainingTime !== undefined ? p.remainingTime : '-') }s</td>`;
-                }
-                if (selectedAlgorithm === 'Priority') {
-                    cols += `<td class="py-3 px-4 text-slate-300">${p.priority ?? '-'}</td>`;
-                }
-                cols += `<td class="py-3 px-4"><span class="px-3 py-1 rounded border ${statusClass(p.status)}">${p.status}</span></td>`;
-                return `<tr class="border-b border-slate-700/50 hover:bg-slate-700/30 transition-colors">${cols}</tr>`;
-            }).join('');
-        tbody.innerHTML = rows;
-
-        // Update navigation buttons
-        document.getElementById('prev-step-btn').disabled = currentStep === 0;
-        document.getElementById('next-step-btn').disabled = currentStep === simulationSteps.length - 1;
-    }
-
-    function statusClass(status){
-        switch(status){
-            case 'New': return 'bg-slate-700/20 text-slate-300 border-slate-600/50';
-            case 'Ready': return 'bg-blue-500/20 text-blue-400 border-blue-500/50';
-            case 'Running': return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50';
-            case 'Waiting': return 'bg-amber-500/20 text-amber-400 border-amber-500/50';
-            case 'Terminated': return 'bg-slate-500/20 text-slate-400 border-slate-500/50';
-            default: return 'bg-slate-500/20 text-slate-400 border-slate-500/50';
-        }
-    }
-
-    /**********************
-     * Simulator implementations (all return steps array)
-     **********************/
-    // FCFS (non-preemptive) - uses arrival order; processes move New -> Ready when arrivalTime <= t
-    function simulateFCFS(inputProcesses){
-        const procs = inputProcesses.map(p=>({ ...p }));
-        // sort by arrival time for FCFS order
-        procs.sort((a,b)=> a.arrivalTime - b.arrivalTime);
-        procs.forEach(p=>{ p.remainingTime = p.remainingTime ?? p.burstTime; p.status = 'New'; });
-        let t = 0;
-        const steps = [];
-        steps.push({ time: t, description: 'Mulai FCFS (urut berdasarkan Arrival Time)', processes: deepSnapshot(procs) });
-
-        for (const proc of procs) {
-            // advance time if process hasn't arrived yet
-            if (t < proc.arrivalTime) {
-                // advance time to proc.arrivalTime
-                t = proc.arrivalTime;
-                // mark any that have arrived as Ready
-                procs.forEach(p=>{ if (p.status !== 'Terminated' && p.arrivalTime <= t) p.status = 'Ready'; });
-                steps.push({ time: t, description: `Waktu maju ke ${t}s (menunggu arrival)`, processes: deepSnapshot(procs) });
-            }
-
-            // ensure this proc is Ready now
-            if (proc.status === 'New' && proc.arrivalTime <= t) proc.status = 'Ready';
-
-            // set to Running
-            proc.status = 'Running';
-            procs.forEach(p=>{ if (p !== proc && p.status !== 'Terminated' && p.arrivalTime <= t) p.status = 'Ready'; });
-            steps.push({ time: t, description: `Proses ${proc.name} mulai Running`, processes: deepSnapshot(procs) });
-
-            // execute until finished (non-preemptive)
-            while (proc.remainingTime > 0) {
-                t++;
-                proc.remainingTime--;
-                // update statuses for processes that have arrived in meantime
-                procs.forEach(p=>{ if (p.status === 'New' && p.arrivalTime <= t) p.status = 'Ready'; });
-                steps.push({ time: t, description: `Proses ${proc.name} mengeksekusi (sisa ${proc.remainingTime}s)`, processes: deepSnapshot(procs) });
-            }
-
-            proc.remainingTime = 0;
-            proc.status = 'Terminated';
-            steps.push({ time: t, description: `Proses ${proc.name} Terminated`, processes: deepSnapshot(procs) });
-        }
-
-        steps.push({ time: t, description: 'Semua proses selesai (FCFS)', processes: deepSnapshot(procs) });
-        return steps;
-    }
-
-    // SJF (non-preemptive) - choose shortest burst from Ready queue (New -> Ready when arrival reached)
-    function simulateSJF(inputProcesses){
-        const procs = inputProcesses.map(p=>({ ...p }));
-        procs.forEach(p=>{ p.remainingTime = p.remainingTime ?? p.burstTime; p.status = 'New'; });
-        let t = 0;
-        const steps = [];
-        steps.push({ time: t, description: 'Mulai SJF (Non-Preemptive)', processes: deepSnapshot(procs) });
-
-        while (procs.some(p=> p.status !== 'Terminated')) {
-            // move arrivals to Ready
-            procs.forEach(p=>{ if (p.status === 'New' && p.arrivalTime <= t) p.status = 'Ready'; });
-            const ready = procs.filter(p=> p.status === 'Ready');
-            if (ready.length === 0) {
-                // no ready process — advance time
-                t++;
-                continue;
-            }
-            // pick shortest burst (remainingTime) among ready
-            ready.sort((a,b)=> a.remainingTime - b.remainingTime || a.arrivalTime - b.arrivalTime);
-            const cur = ready[0];
-            cur.status = 'Running';
-            steps.push({ time: t, description: `Proses ${cur.name} dipilih (burst terpendek)`, processes: deepSnapshot(procs) });
-
-            // execute to completion (non-preemptive)
-            while (cur.remainingTime > 0) {
-                t++;
-                cur.remainingTime--;
-                // update arrivals during execution
-                procs.forEach(p=>{ if (p.status === 'New' && p.arrivalTime <= t) p.status = 'Ready'; });
-                steps.push({ time: t, description: `Proses ${cur.name} mengeksekusi (sisa ${cur.remainingTime}s)`, processes: deepSnapshot(procs) });
-            }
-
-            cur.remainingTime = 0;
-            cur.status = 'Terminated';
-            steps.push({ time: t, description: `Proses ${cur.name} Terminated`, processes: deepSnapshot(procs) });
-        }
-
-        steps.push({ time: t, description: 'Semua proses selesai (SJF)', processes: deepSnapshot(procs) });
-        return steps;
-    }
-
-    // Priority Preemptive - check every tick for higher priority arrival (smaller number = higher priority)
-    function simulatePriorityPreemptive(inputProcesses){
-        const procs = inputProcesses.map(p=>({ ...p }));
-        procs.forEach(p=>{ p.remainingTime = p.remainingTime ?? p.burstTime; p.status = 'New'; });
-        let t = 0;
-        const steps = [];
-        steps.push({ time: t, description: 'Mulai Priority (Preemptive)', processes: deepSnapshot(procs) });
-
-        while (procs.some(p=> p.status !== 'Terminated')) {
-            // arrivals -> Ready
-            procs.forEach(p=>{ if (p.status === 'New' && p.arrivalTime <= t) p.status = 'Ready'; });
-            const ready = procs.filter(p=> p.status === 'Ready');
-            if (ready.length === 0) {
-                t++;
-                continue;
-            }
-            // pick the highest priority (smallest priority number). tie-breaker arrivalTime then name
-            ready.sort((a,b)=> a.priority - b.priority || a.arrivalTime - b.arrivalTime || a.name.localeCompare(b.name));
-            const cur = ready[0];
-            cur.status = 'Running';
-            steps.push({ time: t, description: `Proses ${cur.name} Running (prio ${cur.priority})`, processes: deepSnapshot(procs) });
-
-            // execute one tick, then re-evaluate for preemption
-            t++;
-            cur.remainingTime--;
-            // during this tick new arrivals may become Ready
-            procs.forEach(p=>{ if (p.status === 'New' && p.arrivalTime <= t) p.status = 'Ready'; });
-            steps.push({ time: t, description: `Proses ${cur.name} mengeksekusi (sisa ${cur.remainingTime}s)`, processes: deepSnapshot(procs) });
-
-            if (cur.remainingTime <= 0) {
-                cur.remainingTime = 0;
-                cur.status = 'Terminated';
-                steps.push({ time: t, description: `Proses ${cur.name} Terminated`, processes: deepSnapshot(procs) });
-            } else {
-                // after one tick, set back to Ready to allow preemption selection next loop
-                cur.status = 'Ready';
-            }
-        }
-
-        steps.push({ time: t, description: 'Semua proses selesai (Priority Preemptive)', processes: deepSnapshot(procs) });
-        return steps;
-    }
-
-    // Round Robin - quantum chosen once; processes start New -> Ready when arrival reached
-    function simulateRoundRobin(inputProcesses, quantum=2){
-        const procs = inputProcesses.map(p=>({ ...p }));
-        procs.forEach(p=>{ p.remainingTime = p.remainingTime ?? p.burstTime; p.status = 'New'; });
-        let t = 0;
-        const steps = [];
-        const queue = [];
-        steps.push({ time: t, description: `Mulai Round Robin (quantum ${quantum}s)`, processes: deepSnapshot(procs) });
-
-        while (procs.some(p=> p.status !== 'Terminated')) {
-            // enqueue arrivals (New -> Ready)
-            procs.forEach(p=>{
-                if ((p.status === 'New' || p.status === 'Ready') && p.arrivalTime <= t && !queue.includes(p) && p.status !== 'Terminated') {
-                    if (p.status === 'New') p.status = 'Ready';
-                    queue.push(p);
-                }
-            });
-
-            if (queue.length === 0) {
-                // no process ready, advance time
-                t++;
-                continue;
-            }
-
-            const cur = queue.shift();
-            if (cur.status !== 'Terminated') cur.status = 'Running';
-            steps.push({ time: t, description: `Proses ${cur.name} mulai Running (sisa ${cur.remainingTime}s)`, processes: deepSnapshot(procs) });
-
-            let q = 0;
-            while (q < quantum && cur.remainingTime > 0) {
-                t++; q++; cur.remainingTime--;
-                // arrivals during execution -> enqueue newly arrived processes
-                procs.forEach(p=>{
-                    if ((p.status === 'New' || p.status === 'Ready') && p.arrivalTime <= t && !queue.includes(p) && p.status !== 'Terminated' && p !== cur) {
-                        if (p.status === 'New') p.status = 'Ready';
-                        queue.push(p);
-                    }
-                });
-                steps.push({ time: t, description: `Proses ${cur.name} mengeksekusi (${q}/${quantum}s) (sisa ${cur.remainingTime}s)`, processes: deepSnapshot(procs) });
-            }
-
-            if (cur.remainingTime <= 0) {
-                cur.remainingTime = 0;
-                cur.status = 'Terminated';
-                steps.push({ time: t, description: `Proses ${cur.name} Terminated`, processes: deepSnapshot(procs) });
-            } else {
-                // quantum habis -> back to Ready and enqueue at end
-                cur.status = 'Ready';
-                queue.push(cur);
-                steps.push({ time: t, description: `Quantum habis: ${cur.name} kembali ke Ready (sisa ${cur.remainingTime}s)`, processes: deepSnapshot(procs) });
-            }
-        }
-
-        steps.push({ time: t, description: 'Semua proses selesai (Round Robin)', processes: deepSnapshot(procs) });
-        return steps;
-    }
-
-    </script> -->
-
-</body>
+  </body>
 </html>
