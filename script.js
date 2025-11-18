@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initFormHandlers();
   initSimulationControls();
   renderProcessList();
+  initNavbarScroll();
 });
 
 /**********************
@@ -39,6 +40,26 @@ function deepSnapshot(arr) {
     priority: p.priority,
     status: p.status,
   }));
+}
+
+/**********************
+ * Navbar scroll effect
+ **********************/
+function initNavbarScroll() {
+  const navbar = document.getElementById("navbar");
+  const scrollThreshold = 50; // px threshold untuk trigger blur
+
+  window.addEventListener("scroll", () => {
+    if (window.scrollY > scrollThreshold) {
+      // Tambahkan blur effect
+      navbar.classList.add("backdrop-blur-md");
+      navbar.classList.add("bg-slate-950/80");
+    } else {
+      // Hapus blur effect, kembali ke transparent
+      navbar.classList.remove("backdrop-blur-md");
+      navbar.classList.remove("bg-slate-950/80");
+    }
+  });
 }
 
 /**********************
