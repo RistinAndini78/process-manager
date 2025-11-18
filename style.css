@@ -1,0 +1,116 @@
+/* ====== Card Status Proses ====== */
+.state-card {
+    background: rgba(30, 41, 59, 0.5);
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid;
+    height: 270px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: 0.3s ease;
+}
+
+.state-card:hover {
+    transform: scale(1.05);
+}
+
+.state-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 1rem;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.state-title {
+    text-align: center;
+    color: white;
+    font-weight: bold;
+}
+
+.state-desc {
+    color: #cbd5e1;
+    text-align: center;
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+}
+
+/* ====== Flow Transition ====== */
+.transition-box {
+    background: rgba(30, 41, 59, 0.3);
+    border: 1px solid rgba(100, 116, 139, 0.5);
+    padding: 24px;
+    border-radius: 12px;
+}
+
+.transition-title {
+    text-align: center;
+    color: white;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+.transition-flow {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+}
+
+.flow-step {
+    padding: 12px 24px;
+    border-radius: 12px;
+    border: 1px solid;
+    font-weight: bold;
+}
+
+.flow-arrow {
+    color: #94a3b8;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.purple { border-color: #a855f7; color: #c084fc; background: #a855f720; }
+.blue { border-color: #3b82f6; color: #60a5fa; background: #3b82f620; }
+.emerald { border-color: #10b981; color: #34d399; background: #10b98120; }
+.amber { border-color: #f59e0b; color: #fbbf24; background: #f59e0b20; }
+.slate { border-color: #64748b; color: #cbd5e1; background: #64748b20; }
+
+/* ====== Kartu Algoritma ====== */
+.algo-card {
+    background: rgba(30, 41, 59, 0.5);
+    border-radius: 12px;
+    border: 1px solid rgba(100, 116, 139, 0.5);
+    padding: 24px;
+    transition: 0.3s ease;
+}
+
+.algo-card:hover {
+    border-color: #10b981;
+}
+
+.algo-tag {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 10px;
+    font-weight: bold;
+    border: 1px solid #10b981;
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+}
+
+.algo-title {
+    color: white;
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-top: 6px;
+}
+
+.algo-desc {
+    color: #cbd5e1;
+    margin-top: 12px;
+    line-height: 1.5rem;
+}
