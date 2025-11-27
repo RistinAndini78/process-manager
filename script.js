@@ -256,6 +256,8 @@ function addProcessFromForm() {
 function renderProcessList() {
   const list = document.getElementById("process-list");
   const count = document.getElementById("process-count");
+  const algoSelect = document.getElementById("algorithm-select");
+
   count.textContent = processes.length;
   if (processes.length === 0) {
     list.innerHTML = `<div class="text-center py-12 text-slate-400">Belum ada proses. Tambahkan proses terlebih dahulu.</div>`;
@@ -269,7 +271,7 @@ function renderProcessList() {
             <div class="flex items-center justify-between p-3 bg-slate-900/50 rounded-lg border border-slate-700">
                 <div>
                     <div class="font-semibold">${p.name} <span class="text-xs text-slate-400">(${p.status})</span></div>
-                    <div class="text-sm text-slate-400">Burst: ${p.burstTime}s • Arrival: ${p.arrivalTime}s • Priority: ${p.priority}</div>
+                    <div class="text-sm text-slate-400">Burst: ${p.burstTime}s • Arrival: ${p.arrivalTime}s ${algoSelect.value === "Priority" ? `• Priority: ${p.priority}` : ""}</div>
                 </div>
                 <div class="flex items-center gap-2">
                     <button onclick="removeProcess(${p.id})" class="text-red-400 px-2 py-1 rounded">Hapus</button>
@@ -386,7 +388,7 @@ function startSimulation() {
   document.getElementById("sim-algo-label").textContent =
     labelForAlgo(selectedAlgorithm);
   renderStep();
-  showToast("Simulasi dimulai");
+  showToast("Simulasi dimulai", "");
 }
 
 /**********************
@@ -643,117 +645,193 @@ function simulateSJF(inputProcesses) {
   return steps;
 }
 
-// Priority Preemptive - check every tick for higher priority arrival (smaller number = higher priority)
 function simulatePriorityPreemptive(inputProcesses) {
   const procs = inputProcesses.map((p) => ({ ...p }));
   procs.forEach((p) => {
     p.remainingTime = p.remainingTime ?? p.burstTime;
     p.status = "New";
   });
+
   let t = 0;
   const steps = [];
+  const timeline = [];
+  const ganttSegments = [];
   let currentlyRunning = null;
+  let segmentStart = 0;
 
   steps.push({
     time: t,
-    description: "Mulai Priority (Preemptive)",
+    description:
+      "Mulai Priority (Preemptive) — prioritas lebih kecil = lebih tinggi",
     processes: deepSnapshot(procs),
   });
 
   while (procs.some((p) => p.status !== "Terminated")) {
-    // 1. Proses yang tiba (New -> Ready transition)
+    // 1. Cek apakah ada proses yang tiba pada waktu t (New -> Ready)
+    const newArrivals = [];
     procs.forEach((p) => {
-      if (p.status === "New" && p.arrivalTime <= t) p.status = "Ready";
+      if (p.status === "New" && p.arrivalTime === t) {
+        p.status = "Ready";
+        newArrivals.push(p);
+        steps.push({
+          time: t,
+          description: `Proses ${p.name} tiba dan masuk Ready queue (priority ${p.priority})`,
+          processes: deepSnapshot(procs),
+        });
+      }
     });
 
-    // 2. Cek preemption: apakah ada proses Ready dengan prioritas lebih tinggi?
+    // 2. Dapatkan daftar proses Ready
     const ready = procs.filter((p) => p.status === "Ready");
 
-    if (ready.length === 0) {
-      // Tidak ada proses siap, lompat ke waktu kedatangan proses berikutnya
-      const newArrivals = procs.filter((p) => p.status === "New");
-      if (newArrivals.length === 0) break; // Selesai
-      const nextArrival = Math.min(...newArrivals.map((p) => p.arrivalTime));
+    // 3. Jika tidak ada proses Ready dan tidak ada yang running, maju ke waktu arrival proses berikutnya
+    if (ready.length === 0 && !currentlyRunning) {
+      const newProcs = procs.filter((p) => p.status === "New");
+      if (newProcs.length === 0) {
+        break;
+      }
+      const nextArrival = Math.min(...newProcs.map((p) => p.arrivalTime));
       t = nextArrival;
       continue;
     }
 
-    // Urutkan berdasarkan prioritas
-    ready.sort(
-      (a, b) =>
-        a.priority - b.priority ||
-        a.arrivalTime - b.arrivalTime ||
-        a.name.localeCompare(b.name)
-    );
+    // 4. Cek preemption HANYA jika ada proses baru yang tiba
+    if (newArrivals.length > 0 && currentlyRunning) {
+      // Urutkan Ready queue berdasarkan prioritas (lebih kecil = lebih tinggi)
+      ready.sort(
+        (a, b) =>
+          a.priority - b.priority ||
+          a.arrivalTime - b.arrivalTime ||
+          a.name.localeCompare(b.name)
+      );
 
-    const cur = ready[0];
+      const highestPriorityReady = ready[0];
 
-    // Jika ada proses baru dengan prioritas lebih tinggi, interrupt proses yang berjalan
-    if (currentlyRunning && currentlyRunning !== cur) {
-      currentlyRunning.status = "Ready";
+      // Preempt jika ada proses Ready dengan prioritas lebih tinggi dari yang running
+      if (highestPriorityReady.priority < currentlyRunning.priority) {
+        // Simpan segmen Gantt untuk proses yang dipreempt
+        ganttSegments.push({
+          process: currentlyRunning.name,
+          start: segmentStart,
+          end: t,
+        });
+
+        currentlyRunning.status = "Ready";
+        steps.push({
+          time: t,
+          description: `Proses ${currentlyRunning.name} dipreempt oleh ${highestPriorityReady.name} (priority ${highestPriorityReady.priority} < ${currentlyRunning.priority})`,
+          processes: deepSnapshot(procs),
+        });
+        currentlyRunning = null;
+      }
+    }
+
+    // 5. Jika tidak ada yang running, pilih proses dengan prioritas tertinggi dari Ready queue
+    if (!currentlyRunning && ready.length > 0) {
+      ready.sort(
+        (a, b) =>
+          a.priority - b.priority ||
+          a.arrivalTime - b.arrivalTime ||
+          a.name.localeCompare(b.name)
+      );
+
+      const nextProcess = ready[0];
+      nextProcess.status = "Running";
+      currentlyRunning = nextProcess;
+      segmentStart = t;
+
       steps.push({
         time: t,
-        description: `Proses ${currentlyRunning.name} diinterupsi (preempted) oleh ${cur.name} (prio ${cur.priority} > ${currentlyRunning.priority})`,
+        description: `Proses ${nextProcess.name} mulai Running (priority ${nextProcess.priority})`,
         processes: deepSnapshot(procs),
       });
     }
 
-    // Tampilkan proses dipilih dari Ready Queue sebelum Running
-    if (cur.status === "Ready" && currentlyRunning !== cur) {
+    // 6. Eksekusi proses yang running selama 1 detik
+    if (currentlyRunning) {
+      timeline.push(currentlyRunning.name);
+      t++;
+      currentlyRunning.remainingTime--;
+
       steps.push({
         time: t,
-        description: `Proses ${cur.name} dipilih di Ready Queue (prio ${cur.priority})`,
+        description: `Proses ${currentlyRunning.name} mengeksekusi (${currentlyRunning.burstTime - currentlyRunning.remainingTime}/${currentlyRunning.burstTime}s) • sisa ${currentlyRunning.remainingTime}s`,
         processes: deepSnapshot(procs),
       });
-    }
 
-    // Mulai atau lanjutkan eksekusi proses dengan prioritas tertinggi
-    if (cur.status !== "Running") {
-      cur.status = "Running";
-      steps.push({
-        time: t,
-        description: `Proses ${cur.name} mulai Running (prio ${cur.priority})`,
-        processes: deepSnapshot(procs),
-      });
-    }
+      // 7. Cek apakah proses selesai
+      if (currentlyRunning.remainingTime <= 0) {
+        // Simpan segmen Gantt untuk proses yang selesai
+        ganttSegments.push({
+          process: currentlyRunning.name,
+          start: segmentStart,
+          end: t,
+        });
 
-    currentlyRunning = cur;
+        currentlyRunning.remainingTime = 0;
+        currentlyRunning.status = "Terminated";
+        currentlyRunning.completionTime = t;
 
-    // 3. Eksekusi 1 detik
-    t++;
-    cur.remainingTime--;
+        steps.push({
+          time: t,
+          description: `Proses ${currentlyRunning.name} Terminated (Waktu selesai: ${t}, Total burst: ${currentlyRunning.burstTime}s)`,
+          processes: deepSnapshot(procs),
+        });
 
-    // Proses yang tiba pada waktu baru
-    procs.forEach((p) => {
-      if (p.status === "New" && p.arrivalTime <= t) p.status = "Ready";
-    });
-
-    steps.push({
-      time: t,
-      description: `Proses ${cur.name} mengeksekusi (sisa ${cur.remainingTime}s)`,
-      processes: deepSnapshot(procs),
-    });
-
-    // 4. Cek apakah proses selesai
-    if (cur.remainingTime <= 0) {
-      cur.remainingTime = 0;
-      cur.status = "Terminated";
-      currentlyRunning = null;
-      steps.push({
-        time: t,
-        description: `Proses ${cur.name} Terminated`,
-        processes: deepSnapshot(procs),
-      });
+        currentlyRunning = null;
+      }
     }
   }
 
+  // Tambahkan ringkasan hasil simulasi
+  const summary = {
+    executionOrder: ganttSegments
+      .map((s) => `${s.process} (${s.start}–${s.end})`)
+      .join(" → "),
+    timeline: timeline,
+    ganttSegments: ganttSegments,
+    completionTimes: procs
+      .map((p) => `${p.name} = ${p.completionTime}`)
+      .join(", "),
+  };
+
   steps.push({
     time: t,
-    description: "Semua proses selesai (Priority Preemptive)",
+    description: `Semua proses selesai (Priority Preemptive)`,
     processes: deepSnapshot(procs),
+    summary: summary,
   });
+
   return steps;
 }
+
+// Fungsi helper untuk deep copy
+function deepSnapshot(procs) {
+  return procs.map((p) => ({ ...p }));
+}
+
+// Contoh penggunaan sesuai skenario Anda
+const testProcesses = [
+  { name: "P1", arrivalTime: 0, burstTime: 5, priority: 2 },
+  { name: "P2", arrivalTime: 1, burstTime: 3, priority: 1 },
+  { name: "P3", arrivalTime: 4, burstTime: 4, priority: 3 },
+];
+
+const result = simulatePriorityPreemptive(testProcesses);
+
+// Tampilkan hasil
+console.log("=== PRIORITY PREEMPTIVE SCHEDULING ===\n");
+result.forEach((step) => {
+  console.log(`[t=${step.time}] ${step.description}`);
+  if (step.summary) {
+    console.log("\nTimeline detail:", step.summary.timeline);
+    console.log("\nGantt Segments:");
+    step.summary.ganttSegments.forEach((seg) => {
+      console.log(`  ${seg.process}: ${seg.start}–${seg.end}`);
+    });
+  }
+  console.log("");
+});
 
 // Round Robin - quantum chosen once; processes start New -> Ready when arrival reached
 function simulateRoundRobin(inputProcesses, quantum = 2) {
